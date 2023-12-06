@@ -12,7 +12,7 @@ import test_pytestcv
 # Load environment variable from .env file
 current_path = os.path.dirname(__file__)
 dotenv_filename = os.path.join(current_path, ".env")
-load_dotenv(dotenv_path = dotenv_filename)
+load_dotenv(dotenv_path=dotenv_filename)
 ocr_space_api_key = os.getenv("API_KEY")
 MONGO_URI = os.getenv("MONGO_URI")
 USER_DATABASE_PATH = os.getenv("DATABASE")
@@ -22,7 +22,8 @@ client = MongoClient(MONGO_URI)
 db = client[USER_DATABASE_PATH]
 user_collection = db["users"]
 
-def upload_and_extract_content(image_url = None, local_file_path = None, api_key = None, language = 'eng'):
+
+def upload_and_extract_content(image_url=None, local_file_path=None, api_key=None, language='eng'):
     """
     Uploads an image (either from a URL or a local file), performs OCR, and extracts content.
 
@@ -48,14 +49,15 @@ def upload_and_extract_content(image_url = None, local_file_path = None, api_key
     if local_file_path:
         with open(local_file_path, 'rb') as file:
             files = {'file': file}
-            response = requests.post('https://api.ocr.space/parse/image', files = files, data = {'apikey': api_key, 'language': language})
+            response = requests.post('https://api.ocr.space/parse/image', files=files,
+                                     data={'apikey': api_key, 'language': language})
     else:
         payload = {
             'url': image_url,
             'apikey': api_key,
             'language': language,
         }
-        response = requests.post('https://api.ocr.space/parse/image', data = payload)
+        response = requests.post('https://api.ocr.space/parse/image', data=payload)
 
     if response.status_code == 200:
         error_handler.SUCCESS
@@ -71,6 +73,7 @@ def upload_and_extract_content(image_url = None, local_file_path = None, api_key
         return None
     text = result['ParsedResults'][0]['ParsedText']
     return text
+
 
 def capture_image():
     """
@@ -93,9 +96,10 @@ def capture_image():
         return frame
     except Exception as e:
         print(f"Error: {e}")
-        return None 
+        return None
 
-def create_user(user_input = None, password_input = None):
+
+def create_user(user_input=None, password_input=None):
     """
     Creates a new user and adds their credentials to the database.
 
@@ -126,7 +130,8 @@ def create_user(user_input = None, password_input = None):
         print(f"Error: {e}")
         raise RuntimeError("User already exists.")
 
-def login(user_input = None, password_input = None, input_function=input):
+
+def login(user_input=None, password_input=None, input_function=input):
     """
     Logs in an existing user by verifying their credentials against the database.
 
@@ -154,9 +159,10 @@ def login(user_input = None, password_input = None, input_function=input):
             return username
         else:
             print("Unauthorized. Please check your username and password.")
-            
+
+
 if __name__ == '__main__':
-# Ask the user to login or create a new account
+    # Ask the user to login or create a new account
     user_choice = input("Do you want to (L)ogin or (C)reate a new account? ").upper()
 
     try:
@@ -167,9 +173,9 @@ if __name__ == '__main__':
         else:
             print("Invalid choice. Exiting.")
             exit()
-            
+
         user_data = {user["username"]: {"password": user["password"]} for user in user_collection.find()}
-        
+
         # Capture an image from the webcam
         captured_image = capture_image()
 
@@ -183,7 +189,8 @@ if __name__ == '__main__':
             cv2.imwrite('captured_image.jpg', captured_image)
 
             # Extract content from the captured image
-            extracted_content = upload_and_extract_content(local_file_path='captured_image.jpg', api_key=ocr_space_api_key)
+            extracted_content = upload_and_extract_content(local_file_path='captured_image.jpg',
+                                                           api_key=ocr_space_api_key)
 
             if extracted_content is not None:
                 # Identify words and integers using regular expressions

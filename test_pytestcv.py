@@ -16,6 +16,7 @@ test_client = client
 test_db = test_client[TEST_DATABASE_PATH]
 test_user_collection = test_db["test"]
 
+
 @pytest.fixture
 def setup_database():
     """
@@ -23,19 +24,23 @@ def setup_database():
     """
     test_user_collection.delete_many({})  # Clean the user collection
 
-    yield test_user_collection # The test will run at this point
+    yield test_user_collection  # The test will run at this point
 
     # Clean up the database after the test runs
     test_user_collection.delete_many({})
-    
+
+
 '''User Authentication Test Cases'''
+
+
 # test case to create a new user
 def test_create_user():
     test_username = "test_user_login"
     test_password = "test_password_login"
     created_user, _ = create_user(test_username, test_password)
-    
+
     assert created_user == test_username
+
 
 # Test case to login for an existing user
 def test_login():
@@ -50,7 +55,10 @@ def test_login():
     # Verify the result
     assert logged_in_user == test_username
 
+
 '''Test Cases using MOCK'''
+
+
 # Test case for upload_and_extract_content with image URL
 def test_upload_and_extract_content_with_url():
     """
@@ -63,6 +71,7 @@ def test_upload_and_extract_content_with_url():
 
         extracted_content = upload_and_extract_content(image_url=image_url, api_key=TEST_OCR_API_KEY)
         assert extracted_content == 'Test content'
+
 
 # Test case for upload_and_extract_content with local file path
 def test_upload_and_extract_content_with_local_file(tmp_path):
@@ -79,6 +88,7 @@ def test_upload_and_extract_content_with_local_file(tmp_path):
         extracted_content = upload_and_extract_content(local_file_path=local_file_path, api_key=TEST_OCR_API_KEY)
         assert extracted_content == 'Test content'
 
+
 # Test case for upload_and_extract_content with API error
 def test_upload_and_extract_content_api_error(requests_mock):
     """
@@ -89,6 +99,7 @@ def test_upload_and_extract_content_api_error(requests_mock):
 
     extracted_content = upload_and_extract_content(image_url=image_url, api_key=TEST_OCR_API_KEY)
     assert extracted_content is None
+
 
 # Test case for upload_and_extract_content with invalid response structure
 def test_upload_and_extract_content_invalid_response(requests_mock):
@@ -102,6 +113,7 @@ def test_upload_and_extract_content_invalid_response(requests_mock):
     extracted_content = upload_and_extract_content(image_url=image_url, api_key=TEST_OCR_API_KEY)
     assert extracted_content is None
 
+
 # Test case for capture_image
 def test_capture_image():
     """
@@ -110,7 +122,10 @@ def test_capture_image():
     captured_image = capture_image()
     assert captured_image is not None
 
+
 '''Test cases that uses actual OCR'''
+
+
 # Test case for ocr response verification
 def test_valid_ocr_response():
     """
@@ -121,7 +136,10 @@ def test_valid_ocr_response():
     extracted_content = upload_and_extract_content(local_file_path=image_path, api_key=api_key)
     assert extracted_content == "Time is\r\n10 AM\r\n"
 
-'''Test cases for Error Handling'''        
+
+'''Test cases for Error Handling'''
+
+
 # Test case for invalid API key
 def test_invalid_api_key():
     """
@@ -134,6 +152,7 @@ def test_invalid_api_key():
     except ValueError as e:
         assert str(e) == "Invalid API key"
 
+
 # Test case for validating API key
 def test_missing_api_key():
     """
@@ -141,7 +160,8 @@ def test_missing_api_key():
     """
     with pytest.raises(ValueError, match="API key is required"):
         upload_and_extract_content(image_url="example.jpg", api_key=None)
-            
+
+
 # Test case for upload_and_extract_content with no image provided
 def test_upload_and_extract_content_no_image():
     """
@@ -150,7 +170,8 @@ def test_upload_and_extract_content_no_image():
     with pytest.raises(ValueError, match="Either image URL or local file path must be provided"):
         extracted_content = upload_and_extract_content(api_key=TEST_OCR_API_KEY)
     # assert extracted_content is None
-            
+
+
 # Test case for upload_and_extract_content API response with unexpected status code
 def test_upload_and_extract_content_unexpected_status_code(requests_mock):
     """
@@ -163,6 +184,8 @@ def test_upload_and_extract_content_unexpected_status_code(requests_mock):
 
 
 '''Test Cases using Actual Database'''
+
+
 # Test case to create a new user and verify it in the database
 def test_create_user_and_verify_in_database():
     """
@@ -170,7 +193,7 @@ def test_create_user_and_verify_in_database():
     """
     new_username = "test_user_db"
     new_password = "test_password_db"
-    
+
     # Ensure the user does not exist before creating
     existing_user = user_collection.find_one({"username": new_username})
     assert existing_user is None
@@ -182,6 +205,7 @@ def test_create_user_and_verify_in_database():
     created_user = user_collection.find_one({"username": new_username})
     assert created_user is not None
     assert created_user["password"] == new_password
+
 
 # Test case to create a new user and attempt to create a duplicate
 def test_create_user_duplicate(setup_database):
@@ -199,6 +223,7 @@ def test_create_user_duplicate(setup_database):
     with pytest.raises(RuntimeError, match="User already exists."):
         create_user(existing_username, "new_password")
 
+
 # Test case for login with correct credentials
 def test_login_correct_credentials():
     username = "test_login_user"
@@ -210,6 +235,7 @@ def test_login_correct_credentials():
     # Login with correct credentials
     logged_in_user = login(username, password)
     assert logged_in_user == username
+
 
 # Test case for login with incorrect password
 def test_login_incorrect_password():
@@ -224,6 +250,7 @@ def test_login_incorrect_password():
     with pytest.raises(RuntimeError, match="Unauthorized. Please check your username and password."):
         login(username, "incorrect_password")
 
+
 # Test case for login with non-existent user
 def test_login_nonexistent_user():
     nonexistent_user = "nonexistent_user"
@@ -232,9 +259,46 @@ def test_login_nonexistent_user():
     with pytest.raises(RuntimeError, match="Unauthorized. Please check your username and password."):
         login(nonexistent_user, "password")
 
+
+# Test case for ocr response verification and adding content to the database
+def test_valid_ocr_response_and_add_to_db():
+    """
+    Test case for verifying a valid OCR response and adding the content to the database.
+    """
+    image_path = "captured_image_test.jpg"
+    api_key = TEST_OCR_API_KEY
+
+    # Perform OCR and extract content
+    extracted_content = upload_and_extract_content(local_file_path=image_path, api_key=api_key)
+
+    # Verify the extracted content
+    assert extracted_content == "Time is\r\n10 AM\r\n"
+
+    # Add the extracted content to the database
+    username = "test_user_db_with_content"
+    password = "test_password_db_with_content"
+
+    # Ensure the user does not exist before creating
+    existing_user = user_collection.find_one({"username": username})
+    assert existing_user is None
+
+    # Create a new user
+    create_user(username, password)
+
+    # Add the extracted content to the user's data in the database
+    user_collection.update_one({"username": username}, {"$set": {"extracted_content": extracted_content}})
+
+    # Verify that the user and the extracted content now exist in the database
+    user_with_content = user_collection.find_one({"username": username})
+    assert user_with_content is not None
+    assert user_with_content["password"] == password
+    assert user_with_content["extracted_content"] == extracted_content
+
+
 # Ensure to close the MongoDB client after running the tests
 def teardown():
     client.close()
+
 
 if __name__ == '__main__':
     pytest.main()

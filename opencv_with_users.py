@@ -14,6 +14,7 @@ current_path = os.path.dirname(__file__)
 dotenv_filename = os.path.join(current_path, ".env")
 load_dotenv(dotenv_path=dotenv_filename)
 ocr_space_api_key = os.getenv("API_KEY")
+ocr_url = os.getenv("OCR_URL")
 MONGO_URI = os.getenv("MONGO_URI")
 USER_DATABASE_PATH = os.getenv("DATABASE")
 
@@ -49,7 +50,7 @@ def upload_and_extract_content(image_url=None, local_file_path=None, api_key=Non
     if local_file_path:
         with open(local_file_path, 'rb') as file:
             files = {'file': file}
-            response = requests.post('https://api.ocr.space/parse/image', files=files,
+            response = requests.post(ocr_url, files=files,
                                      data={'apikey': api_key, 'language': language})
     else:
         payload = {
@@ -57,7 +58,7 @@ def upload_and_extract_content(image_url=None, local_file_path=None, api_key=Non
             'apikey': api_key,
             'language': language,
         }
-        response = requests.post('https://api.ocr.space/parse/image', data=payload)
+        response = requests.post(ocr_url, data=payload)
 
     if response.status_code == 200:
         error_handler.SUCCESS
@@ -116,7 +117,7 @@ def create_user(user_input=None, password_input=None):
     try:
         username = user_input or input("Enter your username: ")
         password = password_input or getpass.getpass("Enter your password: ")
-        # Load existing user data from the database----------------
+        # Load existing user data from the database
         # Check if the username already exists in MongoDB
         if user_collection.find_one({"username": username}):
             raise RuntimeError("User already exists.")

@@ -1,0 +1,30 @@
+# dotenv environment variables file
+*.env
+
+# python bytecode
+*.pyc
+*.pyo
+*.pyd
+
+# image files
+*.png
+*.pdf
+*.jpg
+*.pptx
+
+# python test related
+.pytest_cache*
+*tests/.pytest_cache/*
+__pycache__/
+.pytest_cache/
+
+# IDE
+.idea
+
+# Virtual env
+venv
+venv/
+
+*.DS_Store
+.vscode
+.vscode/

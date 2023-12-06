@@ -1,0 +1,8 @@
+SUCCESS = 'Success'
+BAD_REQUEST = 'Bad Request'
+SERVER_ERROR = 'API Error'
+USER_CREATED = 'User created successfully'
+USER_EXIST = 'Conflict - Username already exists'
+LOGIN_SUCCESS = 'Login successful'
+UNAUTHORIZED = 'Unauthorized - Invalid username or password'
+NOT_FOUND = 'User not found'

@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: OCR Image Processing API
+  description: An API for capturing and processing images with OCR (Optical Character Recognition)
+  version: 1.0.0
+
+paths:
+  /upload-and-extract-content:
+    post:
+      summary: Upload an image and extract content using OCR
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              properties:
+                image:
+                  type: string
+                  format: binary
+                api_key:
+                  type: string
+                language:
+                  type: string
+                  default: 'eng'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              example:
+                extracted_content: "Text extracted from the image"
+                words:
+                  - "Word1"
+                  - "Word2"
+                integers:
+                  - 123
+                  - 456
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+
+  /create-user:
+    post:
+      summary: Create a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Bad Request
+        '409':
+          description: Conflict - Username already exists
+        '500':
+          description: Internal Server Error
+
+  /login:
+    post:
+      summary: Login with existing credentials
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Login successful
+        '401':
+          description: Unauthorized - Invalid username or password
+        '404':
+          description: Not Found - User not found
+        '500':
+          description: Internal Server Error

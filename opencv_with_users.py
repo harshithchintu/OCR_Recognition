@@ -136,6 +136,7 @@ def login(user_input=None, password_input=None, input_function=input):
     Logs in an existing user by verifying their credentials against the database.
 
     Args:
+        input_function: For testing
         user_input (str): Username provided by the user.
         password_input (str): Password provided by the user.
 

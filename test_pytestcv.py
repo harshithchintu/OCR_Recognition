@@ -261,6 +261,52 @@ def test_valid_ocr_response_and_add_to_db():
     assert user_with_content["extracted_content"] == extracted_content
 
 
+# Test case for updating extracted content in the database as an array of objects
+def test_update_extracted_content_to_db():
+    """
+    Test case for updating extracted content in the database as an array of objects.
+    """
+    test_user_collection.delete_many({})  # Clean the user collection
+
+    image_path = "captured_image_test.jpg"
+    image_path1 = "captured_image1.jpg"
+    api_key = TEST_OCR_API_KEY
+
+    # Perform OCR and extract content
+    extracted_content1 = upload_and_extract_content(local_file_path=image_path1, api_key=api_key)
+    extracted_content2 = upload_and_extract_content(local_file_path=image_path, api_key=api_key)
+    assert extracted_content1 == "10,20\r\n"
+    assert extracted_content2 == "Time is\r\n10 AM\r\n"
+
+    # Add the extracted content to the database
+    username = "test_user_update_content"
+    password = "test_password_update_content"
+
+    # Ensure the user does not exist before creating
+    existing_user = user_collection.find_one({"username": username})
+    assert existing_user is None
+
+    # Create a test user
+    create_user(username, password)
+
+    # Simulate extracting content (replace this with your actual extraction logic)
+    extracted_content1 = "10,20"
+    extracted_content2 = "Time is 10 AM"
+    extracted_array_content = [{"text": extracted_content1}, {"text": extracted_content2}]
+
+    # Update the user's data in the database to push the extracted content as an array of objects
+    user_collection.update_one({"username": username}, {"$push": {"extracted_content": {"$each": extracted_array_content}}})
+
+    # Retrieve the updated user data from the database
+    updated_user_data = user_collection.find_one({"username": username})
+
+    # Verify that the extracted content is correctly pushed to the array in the database
+    assert updated_user_data is not None
+    assert updated_user_data["extracted_content"] == extracted_array_content
+    print(updated_user_data["extracted_content"])
+    print(extracted_array_content)
+
+
 # Test case for login with correct credentials
 def test_login_correct_credentials():
     username = "test_login_user"

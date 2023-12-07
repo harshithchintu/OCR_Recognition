@@ -164,7 +164,7 @@ def login(user_input=None, password_input=None, input_function=input):
 
 
 if __name__ == '__main__':
-    # Ask the user to login or create a new account
+    # Ask the user to log in or create a new account
     user_choice = input("Do you want to (L)ogin or (C)reate a new account? ").upper()
 
     try:

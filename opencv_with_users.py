@@ -195,13 +195,15 @@ if __name__ == '__main__':
                                                            api_key=ocr_space_api_key)
 
             if extracted_content is not None:
-                extracted_array_content = {"text": extracted_content}
+                cleaned_content = extracted_content.replace('\n', '').replace('\r', '')
+                extracted_array_content = {"text": cleaned_content}
                 user_collection.update_one({"username": username}, {"$push": {"extracted_content": extracted_array_content}})
                 # Identify words and integers using regular expressions
                 words = re.findall(r'\b[A-Za-z]+\b', extracted_content)
                 integers = re.findall(r'\b\d+\b', extracted_content)
 
                 # Display and print the identified words and integers
+                print('Extracted Content: ', extracted_content)
                 print('Extracted Words:', words)
                 print('Extracted Integers:', integers)
             else:
